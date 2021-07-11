@@ -38,7 +38,8 @@ Imports:
     shinyMatrix,
     utils,
     ggridges,
-    Hmisc
+    Hmisc,
+    sn
 URL: https://github.com/OakleyJ/SHELF
 BugReports: https://github.com/OakleyJ/SHELF/issues
 VignetteBuilder: knitr

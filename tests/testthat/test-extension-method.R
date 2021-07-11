@@ -1,4 +1,5 @@
-test_that("extension: normal Y, normal X | Y ",{
+if(FALSE){
+  test_that("extension: normal Y, normal X | Y ",{
   skip_on_cran()
   mY <- 5
   sY <- 2
@@ -75,3 +76,4 @@ test_that("extension: sum of Gamma random variables ",{
   
   
 })
+}

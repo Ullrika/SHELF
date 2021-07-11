@@ -120,6 +120,10 @@ fitdist <-
     n.experts <- ncol(vals)
     normal.parameters <- matrix(NA, n.experts, 2)
     t.parameters <- matrix(NA, n.experts, 3)
+    sn.parameters <- matrix(NA, n.experts, 3)
+    st.parameters <- matrix(NA, n.experts, 4)
+    sn_mix.parameters <- matrix(NA, n.experts, 7)
+    st_mix.parameters <- matrix(NA, n.experts, 9)
     mirrorgamma.parameters <- gamma.parameters <- 
       matrix(NA, n.experts, 2)
     mirrorlognormal.parameters <- 
@@ -127,9 +131,10 @@ fitdist <-
     mirrorlogt.parameters <- logt.parameters <-
       matrix(NA, n.experts, 3)
     beta.parameters <- matrix(NA, n.experts, 2)
-    ssq<-matrix(NA, n.experts, 9)
+    ssq<-matrix(NA, n.experts, 13)
     
     colnames(ssq) <- c("normal", "t",
+                       "sn", "st", "sn_mix","st_mix",
                        "gamma", "lognormal", "logt", "beta",
                        "mirrorgamma",
                        "mirrorlognormal",
@@ -213,6 +218,39 @@ fitdist <-
       t.parameters[i, 1:2] <- c(t.fit$par[1], exp(t.fit$par[2]))
       t.parameters[i, 3] <- tdf[i]
       ssq[i, "t"] <- t.fit$value
+      
+      # Skewed continuous distributions fits ----
+      sn.fit <- optim(c(m,0.5*log(v),0),
+                      sn.error, values = vals[inc,i], 
+                      probabilities = probs[inc,i], 
+                      weights = weights[inc,i]) 
+      sn.parameters[i,] <- c(sn.fit$par[1], exp(sn.fit$par[2]), sn.fit$par[3])
+      ssq[i, "sn"] <- sn.fit$value
+      
+      st.fit <- optim(c(m,0.5*log(v),0),
+                      sn.error, values = vals[inc,i], 
+                      probabilities = probs[inc,i], 
+                      weights = weights[inc,i]) 
+      st.parameters[i,] <- c(st.fit$par[1], exp(st.fit$par[2]), st.fit$par[3], 3)
+      ssq[i, "st"] <- st.fit$value
+      
+      sn_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,rnorm(1,0,3)),
+                      sn_mix.error, values = vals[inc,i], 
+                      probabilities = probs[inc,i], 
+                      weights = weights[inc,i]) 
+      sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
+                                 sn_mix.fit$par[4], exp(sn_mix.fit$par[5]), sn_mix.fit$par[6],
+                                 exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
+      ssq[i, "sn_mix"] <- sn_mix.fit$value
+      
+      st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,rnorm(1,0,3)),
+                          st_mix.error, values = vals[inc,i], 
+                          probabilities = probs[inc,i], 
+                          weights = weights[inc,i]) 
+      st_mix.parameters[i,] <- c(st_mix.fit$par[1], exp(st_mix.fit$par[2]), st_mix.fit$par[3], 3,
+                                 st_mix.fit$par[4], exp(st_mix.fit$par[5]), st_mix.fit$par[6], 3,
+                                 exp(st_mix.fit$par[7])/(1+exp(st_mix.fit$par[7])))
+      ssq[i, "st_mix"] <- st_mix.fit$value
       
       # Positive skew distribution fits ----
       
@@ -352,6 +390,22 @@ fitdist <-
     names(dft) <-c ("location", "scale", "df")
     row.names(dft) <- expertnames
     
+    dfsn <- data.frame(sn.parameters)
+    names(dfsn) <-c ("xi", "omega","alpha")
+    row.names(dfsn) <- expertnames
+    
+    dfst <- data.frame(st.parameters)
+    names(dfst) <-c ("xi", "omega","alpha","nu")
+    row.names(dfst) <- expertnames
+    
+    dfsn_mix <- data.frame(sn_mix.parameters)
+    names(dfsn_mix) <-c ("xi1", "omega1","alpha1","xi2", "omega2","alpha2","pmix")
+    row.names(dfsn_mix) <- expertnames
+    
+    dfst_mix <- data.frame(st_mix.parameters)
+    names(dfst_mix) <-c ("xi1", "omega1","alpha1","nu1","xi2", "omega2","alpha2","nu2","pmix")
+    row.names(dfst_mix) <- expertnames
+    
     dfg <- data.frame(gamma.parameters)
     names(dfg) <-c ("shape", "rate")
     row.names(dfg) <- expertnames
@@ -406,6 +460,10 @@ fitdist <-
     names(probs) <- expertnames
     
     fit <- list(Normal = dfn, Student.t = dft, 
+                'Skewed normal' = dfsn,
+                'Skewed t' = dfst,
+                'Mix of skewed normals' = dfsn_mix,
+                'Mix of skewed ts' = dfst_mix,
                 Gamma = dfg, Log.normal = dfln, 
                 Log.Student.t = dflt, Beta = dfb,
                 mirrorgamma = dfmirrorg,
