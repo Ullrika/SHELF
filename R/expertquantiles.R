@@ -13,7 +13,35 @@ function(fit, q, d = "best", ex = 1){
 		qx <- fit$Student.t[ex,1] + fit$Student.t[ex,2] * qt(q, fit$Student.t[ex,3])	
 	}
 	
-	if(d == "gamma"){
+  if(d == "sn"){
+    qx <- sn::qsn(q, fit$Skewed.normal[ex,1],fit$Skewed.normal[ex,2],fit$Skewed.normal[ex,3])
+  }
+  
+  if(d == "st"){
+    qx <- sn::qst(q, fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4],method=4)
+  }
+  
+  if(d == "sn_mix"){
+    objective <- function(xx){
+      ((sn::psn(xx, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
+                  fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +
+      sn::psn(xx, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
+              fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7]))-q)^2}
+    qx <- optim(fit$Mix.of.skewed.normals[ex,1],objective,method="BFGS")$par
+  }
+  
+  if(d == "st_mix"){
+    objective <- function(xx){
+      ((sn::pst(xx, fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
+                  fit$Mix.of.skewed.ts[ex,3],fit$Mix.of.skewed.ts[ex,4],method=4)*
+          fit$Mix.of.skewed.ts[ex,9] +
+      sn::pst(xx, fit$Mix.of.skewed.ts[ex,5], fit$Mix.of.skewed.ts[ex,6],
+              fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8],method=4)*
+        (1-fit$Mix.of.skewed.ts[ex,9]))-q)^2}
+      qx <- optim(fit$Mix.of.skewed.ts[ex,1],objective,method="BFGS")$par
+    }
+  
+  if(d == "gamma"){
 		xl <- fit$limits[ex,1]
 		if(xl == -Inf){xl <- 0}
 		qx <- xl + qgamma(q, fit$Gamma[ex,1], fit$Gamma[ex,2])  

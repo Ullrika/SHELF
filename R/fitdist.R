@@ -234,7 +234,7 @@ fitdist <-
       st.parameters[i,] <- c(st.fit$par[1], exp(st.fit$par[2]), st.fit$par[3], 3)
       ssq[i, "st"] <- st.fit$value
       
-      sn_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,rnorm(1,0,3)),
+      sn_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
                       sn_mix.error, values = vals[inc,i], 
                       probabilities = probs[inc,i], 
                       weights = weights[inc,i]) 
@@ -243,7 +243,7 @@ fitdist <-
                                  exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
       ssq[i, "sn_mix"] <- sn_mix.fit$value
       
-      st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,rnorm(1,0,3)),
+      st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
                           st_mix.error, values = vals[inc,i], 
                           probabilities = probs[inc,i], 
                           weights = weights[inc,i]) 
@@ -438,10 +438,15 @@ fitdist <-
     row.names(ssq) <- expertnames
     
     if(excludelogt){
-      reducedssq <- ssq[, c("normal", "t", "gamma",
-                              "lognormal", "beta",
-                              "mirrorgamma",
-                              "mirrorlognormal")]
+      reducedssq <- ssq[, c("normal", "t", 
+                            "sn","st",
+                            "sn_mix","st_mix",
+                            #"gamma",
+                            #  "lognormal", 
+                            "beta"#,
+                            #  "mirrorgamma",
+                            #  "mirrorlognormal"
+                            )]
       index <- apply(reducedssq, 1, which.min)
       best.fitting <- data.frame(best.fit=
                                    names(reducedssq)[index])}else{
@@ -460,10 +465,10 @@ fitdist <-
     names(probs) <- expertnames
     
     fit <- list(Normal = dfn, Student.t = dft, 
-                'Skewed normal' = dfsn,
-                'Skewed t' = dfst,
-                'Mix of skewed normals' = dfsn_mix,
-                'Mix of skewed ts' = dfst_mix,
+                Skewed.normal = dfsn,
+                Skewed.t = dfst,
+                Mix.of.skewed.normals = dfsn_mix,
+                Mix.of.skewed.ts = dfst_mix,
                 Gamma = dfg, Log.normal = dfln, 
                 Log.Student.t = dflt, Beta = dfb,
                 mirrorgamma = dfmirrorg,

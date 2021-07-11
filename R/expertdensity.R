@@ -19,6 +19,28 @@ function(fit, d = "best", ex = 1, pl, pu, ql = NULL, qu = NULL, nx = 200){
 		fx <- dt((x - fit$Student.t[ex,1])/fit$Student.t[ex,2], fit$Student.t[ex,3])/fit$Student.t[ex,2]
 	}
 	
+	if(d == "sn"){
+	  fx <- sn::dsn(x, fit$Skewed.normal[ex,1],fit$Skewed.normal[ex,2],fit$Skewed.normal[ex,3])
+	}
+	
+	if(d == "st"){
+	  fx <- sn::dst(x, fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4])
+	}
+	
+	if(d == "sn_mix"){
+	  fx <- sn::dsn(x, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
+	                fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +
+	  sn::dsn(x, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
+	          fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7])
+	}
+	
+	if(d == "st_mix"){
+	  fx <- sn::dst(x, fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
+	                fit$Mix.of.skewed.ts[ex,3],fit$Mix.of.skewed.ts[ex,4])*fit$Mix.of.skewed.ts[ex,9] +
+	    sn::dst(x, fit$Mix.of.skewed.ts[ex,5], fit$Mix.of.skewed.ts[ex,6],
+	            fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8])*(1-fit$Mix.of.skewed.ts[ex,9])
+	}
+	
 	if(d == "gamma"){
 		xl <- fit$limits[ex,1]
 		if(xl == -Inf){xl <- 0}
