@@ -67,7 +67,7 @@ elicitMultiple <- function(){
                                       'Mirror log Student-t' = "mirrorlogt",
                                       'Best fitting' = "best")
           ),
-          checkboxInput("excludeLogT", "Exclude log-t and mirror log-t from best fit", TRUE),
+          checkboxInput("excludeLogT", "Exclude mixtures, log-t and mirror log-t from best fit", TRUE),
           uiOutput("setPDFxaxisLimits"),
           checkboxGroupInput("lp", label = h5("Linear pool"), 
                              choices = list("Display linear pool" = 1)),
