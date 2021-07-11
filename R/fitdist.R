@@ -440,7 +440,7 @@ fitdist <-
     if(excludelogt){
       reducedssq <- ssq[, c("normal", "t", 
                             "sn","st",
-                            "sn_mix","st_mix",
+                            #"sn_mix","st_mix",
                             #"gamma",
                             #  "lognormal", 
                             "beta"#,

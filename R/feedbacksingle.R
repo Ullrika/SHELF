@@ -1,8 +1,10 @@
 feedbacksingle <-
 function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	
-	n.distributions <- 10
-	distribution.names <- c("normal", "t", "gamma", "lognormal",
+	n.distributions <- 14
+	distribution.names <- c("normal", "t", 
+	                        "sn", "st", "sn_mix","st_mix",
+	                        "gamma", "lognormal",
 	                        "logt", "beta", "hist",
 	                        "mirrorgamma", "mirrorlognormal",
 	                        "mirrorlogt")
@@ -20,7 +22,34 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	
 	Mq[, "normal"] <- qnorm(quantiles, fit$Normal[ex,1], fit$Normal[ex,2])
 	Mq[, "t"] <- qt(quantiles, fit$Student.t[ex,3]) * fit$Student.t[ex,2] +
-	  fit$Student.t[ex,1] 
+	  fit$Student.t[ex,1]
+	Mq[, "sn"] <-  sn::qsn(quantiles, fit$Skewed.normal[ex,1],fit$Skewed.normal[ex,2],fit$Skewed.normal[ex,3])
+	Mq[, "st"] <- sn::qst(quantiles, fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4],method=4)
+
+	
+	Mq[, "sn_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
+	  q = quantiles[qi]
+	  objective <- function(xx){
+	  ((sn::psn(xx, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
+	            fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +
+	      sn::psn(xx, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
+	              fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7]))-q)^2
+	}
+	optim(fit$Mix.of.skewed.normals[ex,1],objective,method="BFGS")$par
+	}))
+	
+	Mq[, "st_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
+	  q = quantiles[qi]
+	objective <- function(xx){
+	  ((sn::pst(xx, fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
+	            fit$Mix.of.skewed.ts[ex,3],fit$Mix.of.skewed.ts[ex,4],method=4)*
+	      fit$Mix.of.skewed.ts[ex,9] +
+	      sn::pst(xx, fit$Mix.of.skewed.ts[ex,5], fit$Mix.of.skewed.ts[ex,6],
+	              fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8],method=4)*
+	      (1-fit$Mix.of.skewed.ts[ex,9]))-q)^2}
+	optim(fit$Mix.of.skewed.ts[ex,1],objective,method="BFGS")$par
+	}))
+
 	if(fit$limits[ex,1] > - Inf){
 
 		Mq[, "gamma"] <- fit$limits[ex,1] + 
