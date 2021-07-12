@@ -241,7 +241,10 @@ fitdist <-
       sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
                                  sn_mix.fit$par[4], exp(sn_mix.fit$par[5]), sn_mix.fit$par[6],
                                  exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
-      ssq[i, "sn_mix"] <- sn_mix.fit$value
+      if(sn_mix.fit$value > 1.05*sn.fit$value){  #penalty to avoid overfitting
+      ssq[i, "sn_mix"] <- sn_mix.fit$value}else{
+        ssq[i, "sn_mix"] <- sn.fit$value*0.9
+      }
       
       st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
                           st_mix.error, values = vals[inc,i], 
@@ -250,8 +253,10 @@ fitdist <-
       st_mix.parameters[i,] <- c(st_mix.fit$par[1], exp(st_mix.fit$par[2]), st_mix.fit$par[3], 3,
                                  st_mix.fit$par[4], exp(st_mix.fit$par[5]), st_mix.fit$par[6], 3,
                                  exp(st_mix.fit$par[7])/(1+exp(st_mix.fit$par[7])))
-      ssq[i, "st_mix"] <- st_mix.fit$value
-      
+      if(st_mix.fit$value > 1.05*st.fit$value){  #penalty to avoid overfitting
+        ssq[i, "st_mix"] <- st_mix.fit$value}else{
+          ssq[i, "st_mix"] <- st.fit$value*0.9
+      }
       # Positive skew distribution fits ----
       
       
