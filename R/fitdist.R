@@ -241,9 +241,9 @@ fitdist <-
       sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
                                  sn_mix.fit$par[4], exp(sn_mix.fit$par[5]), sn_mix.fit$par[6],
                                  exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
-      if(sn_mix.fit$value > 1.05*sn.fit$value){  #penalty to avoid overfitting
+      if(sn_mix.fit$value < 0.8*sn.fit$value){  #penalty to avoid overfitting
       ssq[i, "sn_mix"] <- sn_mix.fit$value}else{
-        ssq[i, "sn_mix"] <- sn.fit$value*0.9
+        ssq[i, "sn_mix"] <- sn.fit$value*1.1
       }
       
       st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
@@ -253,9 +253,9 @@ fitdist <-
       st_mix.parameters[i,] <- c(st_mix.fit$par[1], exp(st_mix.fit$par[2]), st_mix.fit$par[3], 3,
                                  st_mix.fit$par[4], exp(st_mix.fit$par[5]), st_mix.fit$par[6], 3,
                                  exp(st_mix.fit$par[7])/(1+exp(st_mix.fit$par[7])))
-      if(st_mix.fit$value > 1.05*st.fit$value){  #penalty to avoid overfitting
+      if(st_mix.fit$value < 0.8*st.fit$value){  #penalty to avoid overfitting
         ssq[i, "st_mix"] <- st_mix.fit$value}else{
-          ssq[i, "st_mix"] <- st.fit$value*0.9
+          ssq[i, "st_mix"] <- st.fit$value*1.1
       }
       # Positive skew distribution fits ----
       
@@ -269,7 +269,7 @@ fitdist <-
                          probabilities = probs[inc,i], 
                          weights = weights[inc,i])
         gamma.parameters[i,] <- exp(gamma.fit$par)
-        ssq[i, "gamma"] <- gamma.fit$value
+        ssq[i, "gamma"] <- gamma.fit$value  +1000 #dirty fix
         
         std<-((log(u - lower[i])-log(l - lower[i]))/1.35)
         
@@ -285,7 +285,7 @@ fitdist <-
                                weights = weights[inc,i])
         lognormal.parameters[i, 1:2] <- c(lognormal.fit$par[1],
                                           exp(lognormal.fit$par[2]))
-        ssq[i, "lognormal"] <- lognormal.fit$value
+        ssq[i, "lognormal"] <- lognormal.fit$value+1000 #dirty fix
         
         logt.fit <- optim(c(log(m.scaled1), log(std)), 
                           logt.error, 
@@ -295,7 +295,7 @@ fitdist <-
                           degreesfreedom = tdf[i])
         logt.parameters[i,1:2] <- c(logt.fit$par[1], exp(logt.fit$par[2]))
         logt.parameters[i,3] <- tdf[i]
-        ssq[i, "logt"] <- logt.fit$value
+        ssq[i, "logt"] <- logt.fit$value +1000 #dirty fix
       }
       
       # Beta distribution fits ----
@@ -340,7 +340,7 @@ fitdist <-
                                probabilities = probsMirrored, 
                                weights = weights[inc,i])
         mirrorgamma.parameters[i,] <- exp(mirrorgamma.fit$par)
-        ssq[i, "mirrorgamma"] <- mirrorgamma.fit$value
+        ssq[i, "mirrorgamma"] <- mirrorgamma.fit$value +1000 #dirty fix
         
         # Mirror log normal
         
@@ -370,7 +370,7 @@ fitdist <-
         mirrorlognormal.parameters[i, 1:2] <-
           c(mirrorlognormal.fit$par[1],
             exp(mirrorlognormal.fit$par[2]))
-        ssq[i, "mirrorlognormal"] <- mirrorlognormal.fit$value
+        ssq[i, "mirrorlognormal"] <- mirrorlognormal.fit$value +1000 #dirty fix
         
         # Mirror log t
         
@@ -383,7 +383,7 @@ fitdist <-
         mirrorlogt.parameters[i,1:2] <- c(mirrorlogt.fit$par[1],
                                           exp(mirrorlogt.fit$par[2]))
         mirrorlogt.parameters[i,3] <- tdf[i]
-        ssq[i, "mirrorlogt"] <- mirrorlogt.fit$value
+        ssq[i, "mirrorlogt"] <- mirrorlogt.fit$value +1000 #dirty fix
         
       }
     }
@@ -446,7 +446,7 @@ fitdist <-
       reducedssq <- ssq[, c("normal", "t", 
                             "sn","st",
                             #"sn_mix","st_mix",
-                            #"gamma",
+                            # "gamma",
                             #  "lognormal", 
                             "beta"#,
                             #  "mirrorgamma",
