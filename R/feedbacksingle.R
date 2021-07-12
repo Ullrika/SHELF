@@ -35,7 +35,7 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	      sn::psn(xx, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
 	              fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7]))-q)^2
 	}
-	optim(fit$Mix.of.skewed.normals[ex,1],objective,method="BFGS")$par
+	  optimize(objective,interval = c(1/100,100)*qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
 	}))
 	
 	Mq[, "st_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
@@ -47,7 +47,7 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	      sn::pst(xx, fit$Mix.of.skewed.ts[ex,5], fit$Mix.of.skewed.ts[ex,6],
 	              fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8],method=4)*
 	      (1-fit$Mix.of.skewed.ts[ex,9]))-q)^2}
-	optim(fit$Mix.of.skewed.ts[ex,1],objective,method="BFGS")$par
+	optimize(objective,interval = c(1/100,100)*qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
 	}))
 
 	if(fit$limits[ex,1] > - Inf){
@@ -128,6 +128,23 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	                        fit$Normal[ex,1], 
 	                        fit$Normal[ex,2])
 	Mp[,"t"] <- pt(valuesMatrix[, "t"], fit$Student.t[ex,3])
+	
+	Mp[,"sn"] <- sn::psn(valuesMatrix[, "sn"], fit$Skewed.normal[ex,1],fit$Skewed.normal[ex,2],fit$Skewed.normal[ex,3])
+	Mp[, "st"] <- sn::pst(valuesMatrix[, "st"], fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4],method=4)
+	
+	
+	Mp[, "sn_mix"] <- sn::psn(valuesMatrix[, "sn_mix"], fit$Mix.of.skewed.normals[ex,1],
+	                          fit$Mix.of.skewed.normals[ex,2],
+	              fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +
+	        sn::psn(valuesMatrix[, "sn_mix"], fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
+	                fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7])
+	Mp[, "st_mix"] <- sn::pst(valuesMatrix[, "st_mix"], fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
+	              fit$Mix.of.skewed.ts[ex,3],fit$Mix.of.skewed.ts[ex,4],method=4)*
+	        fit$Mix.of.skewed.ts[ex,9] +
+	        sn::pst(valuesMatrix[, "st_mix"], fit$Mix.of.skewed.ts[ex,5], fit$Mix.of.skewed.ts[ex,6],
+	                fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8],method=4)*
+	        (1-fit$Mix.of.skewed.ts[ex,9])
+
 	if(fit$limits[ex,1] > - Inf){
 		Mp[, "gamma"] <- pgamma(valuesMatrix[, "gamma"],
 		                        fit$Gamma[ex,1], fit$Gamma[ex,2])
