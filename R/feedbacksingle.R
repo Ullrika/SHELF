@@ -37,8 +37,8 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	return(mean(oo))
 	  }
 	  #optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
-	 # optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
-	  qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+	  optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+	 # qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
 	}))
 	
 	Mq[, "st_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
@@ -53,8 +53,8 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	  return(mean(oo))
 	  }
 	#optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
-	#optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
-	qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+	optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+	#qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
 	}))
 
 	if(fit$limits[ex,1] > - Inf){

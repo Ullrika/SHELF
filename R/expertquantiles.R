@@ -31,8 +31,8 @@ function(fit, q, d = "best", ex = 1){
       return(mean(oo))
       }
     #qx <- optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
-    qx <- qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
-    #qx <- optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+    #qx <- qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+    qx <- optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
     #interval = c(fit$limits$lower,fit$limits$upper)
   }
   
@@ -47,9 +47,9 @@ function(fit, q, d = "best", ex = 1){
       return(mean(oo))}
     #qx <- optimize(objective,
     #               interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
-    qx <- qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
-    #qx <- optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
-    
+    #qx <- qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+    qx <- optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+  
   }
   
   if(d == "gamma"){
