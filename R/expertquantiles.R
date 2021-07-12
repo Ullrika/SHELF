@@ -28,7 +28,7 @@ function(fit, q, d = "best", ex = 1){
       sn::psn(xx, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
               fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7]))-q)^2)
     }
-    qx <- optimize(objective,interval = c(1/100,100)*qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+    qx <- optimize(objective,interval = c(1/10000,1000)*qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
   }
   
   if(d == "st_mix"){
@@ -40,7 +40,7 @@ function(fit, q, d = "best", ex = 1){
               fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8],method=4)*
         (1-fit$Mix.of.skewed.ts[ex,9]))-q)^2)
       }
-    qx <- optimize(objective,interval = c(1/100,100)*qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+    qx <- optimize(objective,interval = c(1/10000,1000)*qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
   }
   
   if(d == "gamma"){
