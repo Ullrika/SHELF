@@ -25,7 +25,8 @@ function(fit, q, d = "best", w = 1){
 		         abs(0.001 * max(qx.individual[i,])), 
 		         length = 10000)
 		px <- plinearpool(fit, x, d, w)
-		qx[i] <- approx(x = px, y = x, xout = q[i], ties = min)$y
+		qx[i] <- approx(x = px, y = x, xout = q[i], ties = min, rule = 2)$y ## Ullrika rule 2
+	
 	}
 qx			
 }

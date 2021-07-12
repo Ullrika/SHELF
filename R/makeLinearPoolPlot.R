@@ -4,7 +4,7 @@ function(fit, xl, xu, d = "best", w = 1, lwd, xlab, ylab,
          nx = 200, addquantile = FALSE, fs = 12,
          expertnames = NULL,
          lpname = "linear pool"){
-	
+	 
   expert <- ftype <- NULL # hack to avoid R CMD check NOTE
   
 	n.experts <- nrow(fit$vals)
@@ -25,7 +25,7 @@ function(fit, xl, xu, d = "best", w = 1, lwd, xlab, ylab,
 	  }
 	  
 	}
-	  
+	 
 	nxTotal <- nx + length(c(ql, qu))
 	
 	x <- matrix(0, nxTotal, n.experts)
@@ -40,6 +40,7 @@ function(fit, xl, xu, d = "best", w = 1, lwd, xlab, ylab,
  
 	
 	for(i in 1:n.experts){
+	  #save(fit,file='fit.Rdata')
 		densitydata <- expertdensity(fit, d[i], ex = i, xl, xu, ql, qu, nx)
 		x[, i] <- densitydata$x
 		fx[, i] <- densitydata$fx 

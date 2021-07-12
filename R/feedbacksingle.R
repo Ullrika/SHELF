@@ -30,24 +30,31 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	Mq[, "sn_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
 	  q = quantiles[qi]
 	  objective <- function(xx){
-	  ((sn::psn(xx, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
+	  oo = ((sn::psn(xx, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
 	            fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +
 	      sn::psn(xx, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
 	              fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7]))-q)^2
-	}
-	  optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+	return(mean(oo))
+	  }
+	  #optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+	 # optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+	  qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
 	}))
 	
 	Mq[, "st_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
 	  q = quantiles[qi]
 	objective <- function(xx){
-	  ((sn::pst(xx, fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
+	  oo = ((sn::pst(xx, fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
 	            fit$Mix.of.skewed.ts[ex,3],fit$Mix.of.skewed.ts[ex,4],method=4)*
 	      fit$Mix.of.skewed.ts[ex,9] +
 	      sn::pst(xx, fit$Mix.of.skewed.ts[ex,5], fit$Mix.of.skewed.ts[ex,6],
 	              fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8],method=4)*
-	      (1-fit$Mix.of.skewed.ts[ex,9]))-q)^2}
-	optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+	      (1-fit$Mix.of.skewed.ts[ex,9]))-q)^2
+	  return(mean(oo))
+	  }
+	#optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+	#optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+	qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
 	}))
 
 	if(fit$limits[ex,1] > - Inf){

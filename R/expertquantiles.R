@@ -23,26 +23,33 @@ function(fit, q, d = "best", ex = 1){
   
   if(d == "sn_mix"){
     objective <- function(xx){
-      ((sn::psn(xx, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
+      oo = ((sn::psn(xx, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
                   fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +
       sn::psn(xx, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
               fit$Mix.of.skewed.normals[ex,6])*(1-fit$Mix.of.skewed.normals[ex,7]))-q)^2
-    }
-    qx <- optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+    
+      return(mean(oo))
+      }
+    #qx <- optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+    qx <- qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+    #qx <- optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
     #interval = c(fit$limits$lower,fit$limits$upper)
   }
   
   if(d == "st_mix"){
     objective <- function(xx){
-      ((sn::pst(xx, fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
+      oo =  ((sn::pst(xx, fit$Mix.of.skewed.ts[ex,1],fit$Mix.of.skewed.ts[ex,2],
                   fit$Mix.of.skewed.ts[ex,3],fit$Mix.of.skewed.ts[ex,4],method=4)*
           fit$Mix.of.skewed.ts[ex,9] +
       sn::pst(xx, fit$Mix.of.skewed.ts[ex,5], fit$Mix.of.skewed.ts[ex,6],
               fit$Mix.of.skewed.ts[ex,7],fit$Mix.of.skewed.ts[ex,8],method=4)*
         (1-fit$Mix.of.skewed.ts[ex,9]))-q)^2
-      }
-    qx <- optimize(objective,
-                   interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+      return(mean(oo))}
+    #qx <- optimize(objective,
+    #               interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+    qx <- qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+    #qx <- optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+    
   }
   
   if(d == "gamma"){
