@@ -644,7 +644,7 @@ if they have been provided,
                        entry = input$entry, 
                        chips = input$myChips)
         save(params,file="fitfromSHELF.Rdata") ## added by ULLRIKA
-        source("get_env.R")## added by ULLRIKA
+        get_env()## added by ULLRIKA
 
         # Knit the document, passing in the `params` list, and eval it in a
         # child of the global environment (this isolates the code in the document
