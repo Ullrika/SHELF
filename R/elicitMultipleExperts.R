@@ -36,7 +36,7 @@ elicitMultiple <- function(){
       sidebarPanel(
         wellPanel(
           numericInput("nExperts", label = h5("Number of experts"),
-                       value = 2, min = 1),
+                       value = 14, min = 1),
           radioButtons("entry", "Input method", 
                        choices = c("Quantiles", "Roulette")),
           conditionalPanel(
@@ -45,8 +45,8 @@ elicitMultiple <- function(){
                       value = "0.25, 0.5, 0.75")),
           conditionalPanel(
             condition = "input.entry == 'Roulette'",
-            numericInput("nBins", label = h5("Number of bins"), value = 10),
-            textInput("limits", label = h5("Parameter limits"), value = "0, 100")
+            numericInput("nBins", label = h5("Number of bins"), value = 12),
+            textInput("limits", label = h5("Parameter limits"), value = "-2, 4")
           )
         ),
         wellPanel(
@@ -643,7 +643,9 @@ if they have been provided,
         params <- list(fit = myfit(), 
                        entry = input$entry, 
                        chips = input$myChips)
-        
+        save(params,file="fitfromSHELF.Rdata") ## added by ULLRIKA
+        source("get_env.R")## added by ULLRIKA
+
         # Knit the document, passing in the `params` list, and eval it in a
         # child of the global environment (this isolates the code in the document
         # from the code in this app).

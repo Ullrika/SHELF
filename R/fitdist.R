@@ -234,29 +234,34 @@ fitdist <-
       st.parameters[i,] <- c(st.fit$par[1], exp(st.fit$par[2]), st.fit$par[3], 3)
       ssq[i, "st"] <- st.fit$value
       
+      ## mixtures of two skewed distributions - 
+      #to be used when roulette method 
+      #to avoid overfitting we derive more points from the linear interpolation of the cdf
+      if(length(vals[inc,i])<4){
+      mix_vals <- approx(vals[inc,i],probs[inc,i],seq(min(vals[inc,i]),max(vals[inc,i]),length.out = 7))
+      }else{
+        mix_vals <- data.frame(x = vals[inc,i], y = probs[inc,i])
+      }
+      
       sn_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
-                      sn_mix.error, values = vals[inc,i], 
-                      probabilities = probs[inc,i], 
+                      sn_mix.error, values = mix_vals$x, 
+                      probabilities = mix_vals$y, 
                       weights = weights[inc,i]) 
       sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
                                  sn_mix.fit$par[4], exp(sn_mix.fit$par[5]), sn_mix.fit$par[6],
                                  exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
-      if(sn_mix.fit$value < 0.8*sn.fit$value){  #penalty to avoid overfitting
-      ssq[i, "sn_mix"] <- sn_mix.fit$value}else{
-        ssq[i, "sn_mix"] <- sn.fit$value*1.1
-      }
+      ssq[i, "sn_mix"] <- sn_mix.fit$value
       
       st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
-                          st_mix.error, values = vals[inc,i], 
-                          probabilities = probs[inc,i], 
+                          st_mix.error, values = mix_vals$x, 
+                          probabilities = mix_vals$y, 
                           weights = weights[inc,i]) 
       st_mix.parameters[i,] <- c(st_mix.fit$par[1], exp(st_mix.fit$par[2]), st_mix.fit$par[3], 3,
                                  st_mix.fit$par[4], exp(st_mix.fit$par[5]), st_mix.fit$par[6], 3,
                                  exp(st_mix.fit$par[7])/(1+exp(st_mix.fit$par[7])))
-      if(st_mix.fit$value < 0.8*st.fit$value){  #penalty to avoid overfitting
-        ssq[i, "st_mix"] <- st_mix.fit$value}else{
-          ssq[i, "st_mix"] <- st.fit$value*1.1
-      }
+      ssq[i, "st_mix"] <- st_mix.fit$value
+      
+          
       # Positive skew distribution fits ----
       
       

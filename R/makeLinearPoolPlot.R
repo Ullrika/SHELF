@@ -62,6 +62,7 @@ function(fit, xl, xu, d = "best", w = 1, lwd, xlab, ylab,
 	)
 	df1$expert <- factor(df1$expert, 
 	                     levels = c(expertnames, lpname))
+	save(df1,file="probdensfromSHELF.Rdata")
 
 	if(legend_full){
 	  
