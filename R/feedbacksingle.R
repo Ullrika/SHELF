@@ -1,9 +1,10 @@
 feedbacksingle <-
 function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	
-	n.distributions <- 14
+	n.distributions <- 15
 	distribution.names <- c("normal", "t", 
-	                        "sn", "st", "sn_mix","st_mix",
+	                        "sn", "st", "normal_mix",
+	                        "sn_mix","st_mix",
 	                        "gamma", "lognormal",
 	                        "logt", "beta", "hist",
 	                        "mirrorgamma", "mirrorlognormal",
@@ -26,6 +27,17 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	Mq[, "sn"] <-  sn::qsn(quantiles, fit$Skewed.normal[ex,1],fit$Skewed.normal[ex,2],fit$Skewed.normal[ex,3])
 	Mq[, "st"] <- sn::qst(quantiles, fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4],method=4)
 
+	Mq[, "normal_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
+	  q = quantiles[qi]
+	  objective <- function(xx){
+	    oo = ((pnorm(xx, fit$Mix.of.normals[ex,1],fit$Mix.of.normals[ex,2])*fit$Mix.of.normals[ex,5] +
+	             pnorm(xx, fit$Mix.of.normals[ex,3], fit$Mix.of.normals[ex,4])*(1-fit$Mix.of.normals[ex,5]))-q)^2
+	    return(mean(oo))
+	  }
+	  #optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+	  optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+	  # qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+	}))
 	
 	Mq[, "sn_mix"] <- unlist(lapply(1:length(quantiles),function(qi){
 	  q = quantiles[qi]
@@ -140,6 +152,9 @@ function(fit, quantiles =  NA, values = NA, sf = 3, ex = 1){
 	Mp[, "st"] <- sn::pst(valuesMatrix[, "st"], fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4],method=4)
 	
 	
+	Mp[, "normal_mix"] <- pnorm(valuesMatrix[, "normal_mix"], fit$Mix.of.normals[ex,1],
+	                          fit$Mix.of.normals[ex,2])*fit$Mix.of.normals[ex,5] +
+	  pnorm(valuesMatrix[, "normal_mix"], fit$Mix.of.normals[ex,3], fit$Mix.of.normals[ex,4])*(1-fit$Mix.of.normals[ex,5])
 	Mp[, "sn_mix"] <- sn::psn(valuesMatrix[, "sn_mix"], fit$Mix.of.skewed.normals[ex,1],
 	                          fit$Mix.of.skewed.normals[ex,2],
 	              fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +

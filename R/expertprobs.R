@@ -23,6 +23,11 @@ function(fit, x, d = "best", ex = 1){
     px <- sn::pst(x, fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4])
   }
   
+  if(d == "normal_mix"){
+    px <- pnorm(x, fit$Mix.of.normals[ex,1],fit$Mix.of.normals[ex,2])*fit$Mix.of.normals[ex,5] +
+      pnorm(x, fit$Mix.of.normals[ex,3], fit$Mix.of.normals[ex,4])*(1-fit$Mix.of.normals[ex,5])
+  }
+  
   if(d == "sn_mix"){
     px <- sn::psn(x, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
                   fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +

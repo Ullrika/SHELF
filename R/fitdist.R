@@ -122,6 +122,7 @@ fitdist <-
     t.parameters <- matrix(NA, n.experts, 3)
     sn.parameters <- matrix(NA, n.experts, 3)
     st.parameters <- matrix(NA, n.experts, 4)
+    normal_mix.parameters <- matrix(NA, n.experts, 5)
     sn_mix.parameters <- matrix(NA, n.experts, 7)
     st_mix.parameters <- matrix(NA, n.experts, 9)
     mirrorgamma.parameters <- gamma.parameters <- 
@@ -131,10 +132,11 @@ fitdist <-
     mirrorlogt.parameters <- logt.parameters <-
       matrix(NA, n.experts, 3)
     beta.parameters <- matrix(NA, n.experts, 2)
-    ssq<-matrix(NA, n.experts, 13)
+    ssq<-matrix(NA, n.experts, 14)
     
     colnames(ssq) <- c("normal", "t",
-                       "sn", "st", "sn_mix","st_mix",
+                       "sn", "st", "normal_mix", 
+                       "sn_mix","st_mix",
                        "gamma", "lognormal", "logt", "beta",
                        "mirrorgamma",
                        "mirrorlognormal",
@@ -234,14 +236,24 @@ fitdist <-
       st.parameters[i,] <- c(st.fit$par[1], exp(st.fit$par[2]), st.fit$par[3], 3)
       ssq[i, "st"] <- st.fit$value
       
-      ## mixtures of two skewed distributions - 
+      ## mixtures of two  distributions - 
       #to be used when roulette method 
       #to avoid overfitting we derive more points from the linear interpolation of the cdf
       if(length(vals[inc,i])<4){
-      mix_vals <- approx(vals[inc,i],probs[inc,i],seq(min(vals[inc,i]),max(vals[inc,i]),length.out = 7))
+        mix_vals <- approx(vals[inc,i],probs[inc,i],seq(min(vals[inc,i]),max(vals[inc,i]),length.out = 7))
       }else{
         mix_vals <- data.frame(x = vals[inc,i], y = probs[inc,i])
       }
+      
+      normal_mix.fit <- optim(c(m,0.5*log(v),m,0.5*log(v),0),
+                          normal_mix.error, values = mix_vals$x, 
+                          probabilities = mix_vals$y, 
+                          weights = weights[inc,i]) 
+      normal_mix.parameters[i,] <- c(normal_mix.fit$par[1], exp(normal_mix.fit$par[2]),
+                                 normal_mix.fit$par[3], exp(normal_mix.fit$par[4]),
+                                 exp(normal_mix.fit$par[5])/(1+exp(normal_mix.fit$par[5])))
+      ssq[i, "normal_mix"] <- normal_mix.fit$value
+      
       
       sn_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
                       sn_mix.error, values = mix_vals$x, 
@@ -408,6 +420,10 @@ fitdist <-
     names(dfst) <-c ("xi", "omega","alpha","nu")
     row.names(dfst) <- expertnames
     
+    dfnormal_mix <- data.frame(normal_mix.parameters)
+    names(dfnormal_mix) <-c ("mean1", "sd1","mean1","sd2","pmix")
+    row.names(dfnormal_mix) <- expertnames
+    
     dfsn_mix <- data.frame(sn_mix.parameters)
     names(dfsn_mix) <-c ("xi1", "omega1","alpha1","xi2", "omega2","alpha2","pmix")
     row.names(dfsn_mix) <- expertnames
@@ -450,6 +466,7 @@ fitdist <-
     if(excludelogt){
       reducedssq <- ssq[, c("normal", "t", 
                             "sn","st",
+                            #"normal_mix",
                             #"sn_mix","st_mix",
                             # "gamma",
                             #  "lognormal", 
@@ -477,6 +494,7 @@ fitdist <-
     fit <- list(Normal = dfn, Student.t = dft, 
                 Skewed.normal = dfsn,
                 Skewed.t = dfst,
+                Mix.of.normals = dfnormal_mix,
                 Mix.of.skewed.normals = dfsn_mix,
                 Mix.of.skewed.ts = dfst_mix,
                 Gamma = dfg, Log.normal = dfln, 

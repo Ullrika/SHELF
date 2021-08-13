@@ -20,7 +20,19 @@ function(fit, q, d = "best", ex = 1){
   if(d == "st"){
     qx <- sn::qst(q, fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4],method=4)
   }
-  
+  if(d == "normal_mix"){
+    objective <- function(xx){
+      oo = ((pnorm(xx, fit$Mix.of.normals[ex,1],fit$Mix.of.normals[ex,2])*
+               fit$Mix.of.skewed.normals[ex,5] +
+               pnorm(xx, fit$Mix.of.normals[ex,3], fit$Mix.of.normals[ex,4])*(1-fit$Mix.of.normals[ex,5]))-q)^2
+      
+      return(mean(oo))
+    }
+    #qx <- optimize(objective,interval = qnorm(c(0.001,0.999), fit$Normal[ex,1], fit$Normal[ex,2]))$minimum
+    #qx <- qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2])
+    qx <- optim(qnorm(q, fit$Normal[ex,1], fit$Normal[ex,2]),objective,method="BFGS")$par
+    #interval = c(fit$limits$lower,fit$limits$upper)
+  }
   if(d == "sn_mix"){
     objective <- function(xx){
       oo = ((sn::psn(xx, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],

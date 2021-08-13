@@ -27,7 +27,12 @@ function(fit, d = "best", ex = 1, pl, pu, ql = NULL, qu = NULL, nx = 200){
 	  fx <- sn::dst(x, fit$Skewed.t[ex,1],fit$Skewed.t[ex,2],fit$Skewed.t[ex,3],fit$Skewed.t[ex,4])
 	}
 	
-	if(d == "sn_mix"){
+  if(d == "normal_mix"){
+    fx <- dnorm(x, fit$Mix.of.normals[ex,1],fit$Mix.of.normals[ex,2])*fit$Mix.of.normals[ex,5] +
+      dnorm(x, fit$Mix.of.normals[ex,3], fit$Mix.of.normals[ex,4])*(1-fit$Mix.of.normals[ex,5])
+  }
+  
+  if(d == "sn_mix"){
 	  fx <- sn::dsn(x, fit$Mix.of.skewed.normals[ex,1],fit$Mix.of.skewed.normals[ex,2],
 	                fit$Mix.of.skewed.normals[ex,3])*fit$Mix.of.skewed.normals[ex,7] +
 	  sn::dsn(x, fit$Mix.of.skewed.normals[ex,4], fit$Mix.of.skewed.normals[ex,5],
