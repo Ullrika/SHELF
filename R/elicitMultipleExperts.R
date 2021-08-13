@@ -24,7 +24,7 @@
 elicitMultiple <- function(){
   
   dist<-c("hist", "normal", "t", 
-          "sn", "st", "sn_mix","st_mix",
+          "sn", "st", "normal_mix","sn_mix","st_mix",
           "gamma", "lognormal", "logt","beta", "best")
   
   # UI ----
@@ -56,6 +56,7 @@ elicitMultiple <- function(){
                                       'Student-t' = "t",
                                       'Skewed normal' = "sn",
                                       'Skewed t' = "st",
+                                      'Mix of normals' = "normal_mix",
                                       'Mix of skewed normals' = "sn_mix",
                                       'Mix of skewed ts' = "st_mix",
                                       Gamma = "gamma",

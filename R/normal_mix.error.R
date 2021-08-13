@@ -1,6 +1,3 @@
-#' @imporFrom sn psn
-#' @export
-
 normal_mix.error <-
 function(parameters, values, probabilities, weights){
   pmix = exp(parameters[5])/(1+exp(parameters[5]))

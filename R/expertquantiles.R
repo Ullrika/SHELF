@@ -23,7 +23,7 @@ function(fit, q, d = "best", ex = 1){
   if(d == "normal_mix"){
     objective <- function(xx){
       oo = ((pnorm(xx, fit$Mix.of.normals[ex,1],fit$Mix.of.normals[ex,2])*
-               fit$Mix.of.skewed.normals[ex,5] +
+               fit$Mix.of.normals[ex,5] +
                pnorm(xx, fit$Mix.of.normals[ex,3], fit$Mix.of.normals[ex,4])*(1-fit$Mix.of.normals[ex,5]))-q)^2
       
       return(mean(oo))
