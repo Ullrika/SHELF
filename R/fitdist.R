@@ -257,7 +257,7 @@ fitdist <-
       sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
                                  sn_mix.fit$par[4], exp(sn_mix.fit$par[5]), sn_mix.fit$par[6],
                                  exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
-      ssq[i, "sn_mix"] <- sn_mix.fit$value +1000 #dirty fix - this distribution will be removed
+      ssq[i, "sn_mix"] <- sn_mix.fit$value 
       
       st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
                           st_mix.error, values = mix_vals$x, 
@@ -266,7 +266,8 @@ fitdist <-
       st_mix.parameters[i,] <- c(st_mix.fit$par[1], exp(st_mix.fit$par[2]), st_mix.fit$par[3], 3,
                                  st_mix.fit$par[4], exp(st_mix.fit$par[5]), st_mix.fit$par[6], 3,
                                  exp(st_mix.fit$par[7])/(1+exp(st_mix.fit$par[7])))
-      ssq[i, "st_mix"] <- st_mix.fit$value +1000 #dirty fix
+      ssq[i, "st_mix"] <- st_mix.fit$value +1000 #dirty fix - this distribution will be removed
+      
       
           
       # Positive skew distribution fits ----
