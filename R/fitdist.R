@@ -228,26 +228,17 @@ fitdist <-
                       weights = weights[inc,i]) 
       sn.parameters[i,] <- c(sn.fit$par[1], exp(sn.fit$par[2]), sn.fit$par[3])
       
-      # penalise with ks statistic
-      sn.sample <- sn::rsn(100,sn.parameters[i,1],sn.parameters[i,2],sn.parameters[i,3])
-      ks <- stats::ks.test(sn.sample,"pnorm",normal.parameters[i,1],normal.parameters[i,2])
-      ssq[i, "sn"] <- sn.fit$value + 1000*(ks$p.value > 0.05)
+      ssq[i, "sn"] <- sn.fit$value
       
       st.fit <- optim(c(m,0.5*log(v),0),
                       st.error, values = vals[inc,i], 
                       probabilities = probs[inc,i], 
                       weights = weights[inc,i]) 
       st.parameters[i,] <- c(st.fit$par[1], exp(st.fit$par[2]), st.fit$par[3], 3)
-      # penalise with ks statistic
-      st.sample <- sn::rsn(100,sn.parameters[i,1],sn.parameters[i,2],sn.parameters[i,3])
-      
-      t.sample <- rt(10^4,t.parameters[i,3])*t.parameters[i,2]+t.parameters[i,2]
-      ks <- stats::ks.test(st.sample,t.sample)
-      ssq[i, "st"] <- st.fit$value + 1000*(ks$p.value > 0.05)
+      ssq[i, "st"] <- st.fit$value
       
       ## mixtures of two  distributions - 
-      #to be used when roulette method 
-      mix_vals <- data.frame(x = vals[inc,i], y = probs[inc,i])
+       mix_vals <- data.frame(x = vals[inc,i], y = probs[inc,i])
       
       normal_mix.fit <- optim(c(m,0.5*log(v),m,0.5*log(v),0),
                           normal_mix.error, values = mix_vals$x, 
@@ -256,15 +247,8 @@ fitdist <-
       normal_mix.parameters[i,] <- c(normal_mix.fit$par[1], exp(normal_mix.fit$par[2]),
                                  normal_mix.fit$par[3], exp(normal_mix.fit$par[4]),
                                  exp(normal_mix.fit$par[5])/(1+exp(normal_mix.fit$par[5])))
-      r1 = rnorm(100,normal_mix.parameters[i,1],normal_mix.parameters[i,2])
-      r2 = rnorm(100,normal_mix.parameters[i,3],normal_mix.parameters[i,4])
-      mix = runif(100) < normal_mix.parameters[i,5]
-      normal_mix.sample = r1*mix + r2*(1-mix)
+      ssq[i, "normal_mix"] <- normal_mix.fit$value 
       
-      ks <- stats::ks.test(normal_mix.sample,"pnorm",normal.parameters[i,1],normal.parameters[i,2])
-      
-      ssq[i, "normal_mix"] <- normal_mix.fit$value + 1000*(ks$p.value > 0.05) + 1000*(length(inc)<7) # do not use mixture for few vals/probs pairs
-
       
       sn_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
                       sn_mix.error, values = mix_vals$x, 
@@ -273,7 +257,7 @@ fitdist <-
       sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
                                  sn_mix.fit$par[4], exp(sn_mix.fit$par[5]), sn_mix.fit$par[6],
                                  exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
-      ssq[i, "sn_mix"] <- sn_mix.fit$value +1000 #dirty fix
+      ssq[i, "sn_mix"] <- sn_mix.fit$value +1000 #dirty fix - this distribution will be removed
       
       st_mix.fit <- optim(c(m,0.5*log(v),0,m,0.5*log(v),0,0),
                           st_mix.error, values = mix_vals$x, 
