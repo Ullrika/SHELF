@@ -416,7 +416,7 @@ fitdist <-
     row.names(dfst) <- expertnames
     
     dfnormal_mix <- data.frame(normal_mix.parameters)
-    names(dfnormal_mix) <-c ("mean1", "sd1","mean1","sd2","pmix")
+    names(dfnormal_mix) <-c ("mean1", "sd1","mean2","sd2","pmix")
     row.names(dfnormal_mix) <- expertnames
     
     dfsn_mix <- data.frame(sn_mix.parameters)
