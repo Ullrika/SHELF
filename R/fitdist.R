@@ -238,7 +238,13 @@ fitdist <-
       ssq[i, "st"] <- st.fit$value
       
       ## mixtures of two  distributions - 
-       mix_vals <- data.frame(x = vals[inc,i], y = probs[inc,i])
+      mix_vals <- data.frame(x = vals[inc,i], y = probs[inc,i])
+      
+      ww <- c(mix_vals$y[-1],1)-
+        c(0,mix_vals$y[-length(mix_vals$y)])
+      wi <- order(ww,decreasing = TRUE)
+      m12 <- mix_vals$x[wi[1:2]]
+      
       
       normal_mix.fit <- optim(c(m-sqrt(v),0.5*log(v),m+sqrt(v),0.5*log(v),0),## NEW FIX
                           #c(m,0.5*log(v),m,0.5*log(v),0), ## OLD
@@ -251,8 +257,9 @@ fitdist <-
       ssq[i, "normal_mix"] <- normal_mix.fit$value 
       
       
-      sn_mix.fit <- optim(c(m-sqrt(v),0.5*log(v),0,m+sqrt(v),0.5*log(v),0,0),
-                      sn_mix.error, values = mix_vals$x, 
+      sn_mix.fit <- optim(c(1.7,0.5,0,3.7,0.5,0,0),
+                          #c(m-sqrt(v),0.5*log(v),0,m+sqrt(v),0.5*log(v),0,0),
+                          sn_mix.error, values = mix_vals$x, 
                       probabilities = mix_vals$y, 
                       weights = weights[inc,i]) 
       sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
