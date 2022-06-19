@@ -257,8 +257,7 @@ fitdist <-
       ssq[i, "normal_mix"] <- normal_mix.fit$value 
       
       
-      sn_mix.fit <- optim(c(1.7,0.5,0,3.7,0.5,0,0),
-                          #c(m-sqrt(v),0.5*log(v),0,m+sqrt(v),0.5*log(v),0,0),
+      sn_mix.fit <- optim(c(m-sqrt(v),0.5*log(v),0,m+sqrt(v),0.5*log(v),0,0),
                           sn_mix.error, values = mix_vals$x, 
                       probabilities = mix_vals$y, 
                       weights = weights[inc,i]) 
