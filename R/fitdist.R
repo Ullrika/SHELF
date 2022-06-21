@@ -106,7 +106,8 @@ fitdist <-
   function(vals, probs, lower = -Inf,
            upper = Inf, weights = 1, tdf = 3,
            expertnames = NULL,
-           excludelogt = FALSE){
+           excludelogt = FALSE,
+           init_m = NULL){
     
     if(is.matrix(vals)==F){vals<-matrix(vals, nrow = length(vals), ncol = 1)}
     if(is.matrix(probs)==F){probs <- matrix(probs, nrow = nrow(vals), ncol = ncol(vals))}
@@ -244,8 +245,11 @@ fitdist <-
         c(0,mix_vals$y[-length(mix_vals$y)])
       wi <- order(ww,decreasing = TRUE)
       m12 <- mix_vals$x[wi[1:2]]
-      
-      
+      m1 = m2 = m
+      if(!is.null(init_m)){
+        m1 = init_m[1]
+        m2 = init_m[2]
+      }
       normal_mix.fit <- optim(c(m-sqrt(v),0.5*log(v),m+sqrt(v),0.5*log(v),0),## NEW FIX
                           #c(m,0.5*log(v),m,0.5*log(v),0), ## OLD
                           normal_mix.error, values = mix_vals$x, 
