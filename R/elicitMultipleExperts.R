@@ -36,7 +36,7 @@ elicitMultiple <- function(){
       sidebarPanel(
         wellPanel(
           numericInput("nExperts", label = h5("Number of experts"),
-                       value = 14, min = 1),
+                       value = 16, min = 1),
           radioButtons("entry", "Input method", 
                        choices = c("Quantiles", "Roulette")),
           conditionalPanel(
@@ -45,8 +45,8 @@ elicitMultiple <- function(){
                       value = "0.25, 0.5, 0.75")),
           conditionalPanel(
             condition = "input.entry == 'Roulette'",
-            numericInput("nBins", label = h5("Number of bins"), value = 12),
-            textInput("limits", label = h5("Parameter limits"), value = "-2, 4")
+            numericInput("nBins", label = h5("Number of bins"), value = 14),
+            textInput("limits", label = h5("Parameter limits"), value = "-3, 4")
           )
         ),
         wellPanel(
@@ -68,7 +68,8 @@ elicitMultiple <- function(){
                                       'Mirror log Student-t' = "mirrorlogt",
                                       'Best fitting' = "best")
           ),
-          checkboxInput("excludeLogT", "Exclude mixtures, log-t and mirror log-t from best fit", TRUE),
+          checkboxInput("excludeLogT", "Exclude mixtures",TRUE),
+#                        , log-t and mirror log-t from best fit", TRUE),
           uiOutput("setPDFxaxisLimits"),
           checkboxGroupInput("lp", label = h5("Linear pool"), 
                              choices = list("Display linear pool" = 1)),

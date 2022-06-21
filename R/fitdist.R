@@ -106,8 +106,7 @@ fitdist <-
   function(vals, probs, lower = -Inf,
            upper = Inf, weights = 1, tdf = 3,
            expertnames = NULL,
-           excludelogt = FALSE,
-           init_m = NULL){
+           excludelogt = FALSE){
     
     if(is.matrix(vals)==F){vals<-matrix(vals, nrow = length(vals), ncol = 1)}
     if(is.matrix(probs)==F){probs <- matrix(probs, nrow = nrow(vals), ncol = ncol(vals))}
@@ -202,6 +201,14 @@ fitdist <-
       #  v<- (u - l)^2 / 0.25 # Estimated variance on original scale
      # } 
       
+      # Find initial values for fitting 
+        change <- probs[inc,i][-1]-probs[inc,i][-length(probs[inc,i])]
+        ind1 <- min(which(change<0))
+        ind2 <- max(which(change>0))
+        init_m <- vals[inc,i][c(ind1,ind2)]
+        m1 = init_m[1]
+        m2 = init_m[2]
+        
       # Symmetric distribution fits ----
       
       normal.fit <- optim(c(m, 0.5*log(v)), 
@@ -241,15 +248,7 @@ fitdist <-
       ## mixtures of two  distributions - 
       mix_vals <- data.frame(x = vals[inc,i], y = probs[inc,i])
       
-      ww <- c(mix_vals$y[-1],1)-
-        c(0,mix_vals$y[-length(mix_vals$y)])
-      wi <- order(ww,decreasing = TRUE)
-      m12 <- mix_vals$x[wi[1:2]]
-      m1 = m2 = m
-      if(!is.null(init_m)){
-        m1 = init_m[1]
-        m2 = init_m[2]
-      }
+     
       normal_mix.fit <- optim(c(m1,0.5*log(v),m2,0.5*log(v),0),## NEW FIX
                           #c(m,0.5*log(v),m,0.5*log(v),0), ## OLD
                           normal_mix.error, values = mix_vals$x, 
@@ -268,7 +267,7 @@ fitdist <-
       sn_mix.parameters[i,] <- c(sn_mix.fit$par[1], exp(sn_mix.fit$par[2]), sn_mix.fit$par[3],
                                  sn_mix.fit$par[4], exp(sn_mix.fit$par[5]), sn_mix.fit$par[6],
                                  exp(sn_mix.fit$par[7])/(1+exp(sn_mix.fit$par[7])))
-      ssq[i, "sn_mix"] <- sn_mix.fit$value 
+      ssq[i, "sn_mix"] <- sn_mix.fit$value + 1000 #dirty fix - 
       
       st_mix.fit <- optim(c(m1,0.5*log(v),0,m2,0.5*log(v),0,0),
                           st_mix.error, values = mix_vals$x, 
@@ -482,10 +481,20 @@ fitdist <-
                             #  "mirrorlognormal"
                             )]
       index <- apply(reducedssq, 1, which.min)
-      best.fitting <- data.frame(best.fit=
-                                   names(reducedssq)[index])}else{
-      index <- apply(ssq, 1, which.min)
-      best.fitting <- data.frame(best.fit=names(ssq)[index])
+      best.fitting <- data.frame(best.fit=names(reducedssq)[index])
+      }else{
+        reducedssq <- ssq[, c("normal", "t","sn","st","normal_mix",
+                                                           #"sn_mix","st_mix",
+                                                           # "gamma",
+                                                           #  "lognormal", 
+                                                           "beta"#,
+                                                           #  "mirrorgamma",
+                                                           #  "mirrorlognormal"
+                                     )]
+      index <- apply(reducedssq, 1, which.min) ## USE SINCE WE ONLY ADD NORMAL MIXTURE
+      #index <- apply(ssq, 1, which.min)
+      best.fitting <- data.frame(best.fit=names(reducedssq)[index])
+      #best.fitting <- data.frame(best.fit=names(ssq)[index])
       }
       
   
