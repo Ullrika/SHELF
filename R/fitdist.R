@@ -203,12 +203,13 @@ fitdist <-
       
       # Find initial values for fitting 
         change <- probs[inc,i][-1]-probs[inc,i][-length(probs[inc,i])]
-        ind1 <- min(which(change<0))
-        ind2 <- max(which(change>0))
-        init_m <- vals[inc,i][c(ind1,ind2)]
-        m1 = init_m[1]
-        m2 = init_m[2]
-        
+        if(sum(which(change<0))>0){
+        m1 <- vals[inc,i][min(which(change<0))]
+        }else{m1 <- m}
+        if(sum(which(change>0))>0){
+        m2 <- vals[inc,i][max(which(change>0))]
+        }else{m2 <- m}
+
       # Symmetric distribution fits ----
       
       normal.fit <- optim(c(m, 0.5*log(v)), 
