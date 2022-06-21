@@ -38,7 +38,7 @@ elicitMultiple <- function(){
           numericInput("nExperts", label = h5("Number of experts"),
                        value = 16, min = 1),
           radioButtons("entry", "Input method", 
-                       choices = c("Quantiles", "Roulette")),
+                       choices = c("Roulette","Quantiles")),
           conditionalPanel(
             condition = "input.entry == 'Quantiles'",
             textInput("probs", label = h5("Cumulative probabilities"), 
@@ -68,7 +68,7 @@ elicitMultiple <- function(){
                                       'Mirror log Student-t' = "mirrorlogt",
                                       'Best fitting' = "best")
           ),
-          checkboxInput("excludeLogT", "Exclude mixtures",TRUE),
+          checkboxInput("excludeLogT", "Exclude mixtures",FALSE),
 #                        , log-t and mirror log-t from best fit", TRUE),
           uiOutput("setPDFxaxisLimits"),
           checkboxGroupInput("lp", label = h5("Linear pool"), 
