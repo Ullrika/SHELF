@@ -202,7 +202,8 @@ fitdist <-
      # } 
       
       # Find initial values for fitting 
-        change <- probs[inc,i][-1]-probs[inc,i][-length(probs[inc,i])]
+        cdfincs <- c(probs[inc,i][-1],1)-c(0,probs[inc,i][-length(probs[inc,i])])
+        change <- cdfincs[-1]-cdfincs[-length(cdfincs)]
         if(sum(which(change<0))>0){
         m1 <- vals[inc,i][min(which(change<0))]
         }else{m1 <- m}
