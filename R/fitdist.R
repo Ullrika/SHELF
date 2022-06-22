@@ -208,7 +208,7 @@ fitdist <-
         m1 <- vals[inc,i][min(which(change<0))]
         }else{m1 <- m}
         if(sum(which(change>0))>0){
-        m2 <- vals[inc,i][max(which(change>0))]
+        m2 <- vals[inc,i][1+max(which(change>0))]
         }else{m2 <- m}
 
       # Symmetric distribution fits ----
